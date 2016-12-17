@@ -42,7 +42,7 @@ DEPS := $(OBJECTS:.o=.d)
 CXX := g++
 
 #compile flags
-CXXFLAGS := -Wall -g #-fcolor-diagnostics 
+CXXFLAGS := -std=c++14 -Wall -g #-fcolor-diagnostics 
 
 #link flags
 LDFLAGS = -lm
