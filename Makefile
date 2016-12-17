@@ -42,7 +42,7 @@ DEPS := $(OBJECTS:.o=.d)
 CXX := g++
 
 #compile flags
-CXXFLAGS := -std=c++14 -Wall -g #-fcolor-diagnostics 
+CXXFLAGS := -Wall -g -std=c++14
 
 #link flags
 LDFLAGS = -lm
@@ -74,7 +74,7 @@ $(LINK_TARGET): $(OBJECTS)
 
 # generate dependencies using the c++ preprocessor
 $(DIR_TMP)/%.d : $(DIR_SOURCES)/%.cpp
-	$(CXX) $(INCLUDES) $(ADDITIONAL_INCLUDES) -MM -MP -MT $(@:.d=.o) $< -MF $@ 
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ADDITIONAL_INCLUDES) -MM -MP -MT $(@:.d=.o) $< -MF $@ 
 
 # generate objects from c++ sources
 $(DIR_TMP)/%.o : $(DIR_SOURCES)/%.cpp
