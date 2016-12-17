@@ -67,7 +67,7 @@ dirs:
 
 # link - generate the executable
 $(LINK_TARGET): $(OBJECTS)
-	@echo Linking...
+	@echo Linking $(LINK_TARGET)
 	$(CXX) $(LDFLAGS) $^ -o $@
 
 -include $(DEPS)
@@ -78,7 +78,7 @@ $(DIR_TMP)/%.d : $(DIR_SOURCES)/%.cpp
 
 # generate objects from c++ sources
 $(DIR_TMP)/%.o : $(DIR_SOURCES)/%.cpp
-	@echo Compiling $@
+	@echo Compiling $<
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ADDITIONAL_INCLUDES) -c $< -o $@
 
 .PHONY : clean
