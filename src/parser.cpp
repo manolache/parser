@@ -2,6 +2,9 @@
 #include <regex>
 #include <string>
 
+
+#include "IniParser.h"
+
 using namespace std;
 
 string trim(const string& s) {
@@ -17,6 +20,9 @@ string trim(const string& s) {
 }
 
 int main () {
+
+    IniParser parser;
+
     string strComment = "  ; comment";
     std::regex regComment("(\\s*?)(;|#)(.*)", regex::ECMAScript); // posix
     std::regex regSection("(\\s*?)\\[[^\\]\\r\\n]+](\\s*?)", regex::ECMAScript); // posix
