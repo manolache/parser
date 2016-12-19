@@ -7,21 +7,10 @@
 
 using namespace std;
 
-string trim(const string& s) {
-    string::const_iterator it = s.begin();
-    while (it != s.end() && isspace(*it))
-        it++;
-
-    string::const_reverse_iterator rit = s.rbegin();
-    while (rit.base() != it && isspace(*rit))
-        rit++;
-
-    return string(it, rit.base());
-}
-
 int main () {
 
     IniParser parser;
+    parser.updateFromFile("..//string.in");
 
     string strComment = "  ; comment";
     std::regex regComment("(\\s*?)(;|#)(.*)", regex::ECMAScript); // posix

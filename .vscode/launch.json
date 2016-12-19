@@ -8,7 +8,7 @@
             "program": "${workspaceRoot}/out/parser",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
+            "cwd": "${workspaceRoot}/out",
             "environment": [],
             "externalConsole": true,
             "linux": {

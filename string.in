@@ -1,1 +1,20 @@
-"[abbbbbbbbz]"
+; this is a comment
+
+aaaaaaaaaaaaa
+
+[section]
+key = value
+key2 = value2
+
+key 3 = value3
+
+   ;  this is another comment
+
+bbbbbbbb
+
+    ;   [this is still a comment]
+
+ccccc
+
+  
+ssssssssssssssssssssssssss
