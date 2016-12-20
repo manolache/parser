@@ -12,7 +12,9 @@ int main () {
         parser.reset();
         parser.updateFromFile("..//test1.ini");
         cout << parser.getValue("section.subsection", "city") << endl;
-        parser.getValue("mucipeclanta");
+        cout << parser.getBool("section.subsection", "isNice") << endl;
+        cout << parser.getInt("section", "key2") << endl;
+        parser.getString("", "mucipeclanta");
     } catch (invalid_argument ex) {
         cout<< ex.what();
         return -1;          // gracefully handle exception        

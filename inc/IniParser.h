@@ -17,6 +17,15 @@ public: // methods
     const string& getValue(const string& section, const string& strKey);
     const string& getValue(const string& strKey);
 
+    int getInt(const string& strSection, const string& strKey);
+    int getInt(const string& strKey);
+
+    string getString(const string& strSection, const string& strKey);
+    string getString(const string& strKey);
+    
+    bool getBool(const string& strSection, const string& strKey);
+    bool getBool(const string& strKey);
+
 public: // inner classes
     class no_such_key_exception: public logic_error
     {
