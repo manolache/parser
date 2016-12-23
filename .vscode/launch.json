@@ -6,9 +6,9 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/out/parser",
-            "args": [],
+            "args": ["res/empty.ini", "res/first.ini", "res/update.ini"],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}/out",
+            "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,
             "linux": {

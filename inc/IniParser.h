@@ -13,6 +13,7 @@ public: // methods
 
     void reset();
     int updateFromFile(const string& strFileName);
+    size_t getNoOfValues() const;
     
     const string& getValue(const string& section, const string& strKey);
     const string& getValue(const string& strKey);

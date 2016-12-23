@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include <assert.h>
+
 #include "IniParser.h"
 
 using namespace std;
@@ -29,7 +31,6 @@ IniParser::IniParser(const string &strFileName, bool skipInvalidLines) : IniPars
 
 int IniParser::updateFromFile(const string &strFileName)
 {
-
     // check for empty file name
     if (strFileName.empty())
         throw invalid_argument("The input file name is empty!");
@@ -38,7 +39,7 @@ int IniParser::updateFromFile(const string &strFileName)
 
     // check if file was open
     if (ifs.fail())
-        throw invalid_argument("Unable to open the input file");
+        throw invalid_argument("Unable to open the input file " + strFileName);
 
     // start with an empty section
     strCurrentSection = "";
@@ -54,7 +55,7 @@ int IniParser::updateFromFile(const string &strFileName)
         //skip empty lines
         if (strLine.empty())
         {
-            logInfo("empty line! Skipping...");
+            logInfo("matched empty line, skipping...");
             continue;
         }
 
@@ -84,30 +85,25 @@ int IniParser::updateFromFile(const string &strFileName)
                 continue;
             }
         }
-        catch (const regex_error &ex)
-        {
+        catch (const regex_error &ex) {
             logError("regex exceptrion");
             return -1;
         }
 
-        if (bSkipInvalidLines)
-        {
-            logInfo("line " + strLine + " is invalid! Skipping...");
+        if (bSkipInvalidLines) {
+            logInfo("matched invalid line, skipping: " + strLine);
         }
-        else
-        {
-            logError("line " + strLine + " is invalid!");
-            throw invalid_format_exception();
+        else {
+            logError("matched invalid line, skipping: " + strLine);
+            throw invalid_format_exception("matched invalid line: " + strLine);
         }
     }
 
     ifs.close();
     logInfo("done reading " + strFileName);
 
-#ifdef DEBUG
     // display the internal representation of the parser
     logValues();
-#endif
 
     return 0;
 }
@@ -116,6 +112,10 @@ void IniParser::reset()
 {
     values.clear();
     strCurrentSection = "";
+}
+
+size_t IniParser::getNoOfValues() const {
+    return values.size();
 }
 
 const string &IniParser::getValue(const string &strKey)
@@ -173,6 +173,9 @@ bool IniParser::getBool(const string &strSection, const string &strKey)
 
 void IniParser::handleSection(const string &strSection)
 {
+    // even if the regex guarantees that the match is longer than 2, it's better to assert for debuggig purpuses
+    assert(strSection.length() >= 2);
+
     // remove the [ ] and trim once again
     strCurrentSection = trim(strSection.substr(1, strSection.length() - 2));
 }
@@ -209,18 +212,21 @@ string IniParser::trim(const string &s)
 
 void IniParser::logValues()
 {
-
+#ifdef DEBUG
     clog << values.size() << " values:\n";
     for (auto it = values.begin(); it != values.end(); ++it)
         clog << it->first << " = " << it->second << '\n';
+#endif
 }
 
 void IniParser::logInfo(const string &strMsg)
 {
-    clog << "Info: " + strMsg << endl;
+#ifdef DEBUG
+    clog << "Parser - Info: " + strMsg << endl;
+#endif
 }
 
 void IniParser::logError(const string &strError)
 {
-    cerr << "Error: " + strError << endl;
+    cerr << "Parser- Error: " + strError << endl;
 }
