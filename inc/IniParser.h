@@ -15,14 +15,11 @@ public: // methods
     int updateFromFile(const string& strFileName);
     size_t getNoOfValues() const;
     
-    const string& getValue(const string& section, const string& strKey);
-    const string& getValue(const string& strKey);
+    string getString(const string& strSection, const string& strKey);
+    string getString(const string& strKey);
 
     int getInt(const string& strSection, const string& strKey);
     int getInt(const string& strKey);
-
-    string getString(const string& strSection, const string& strKey);
-    string getString(const string& strKey);
     
     bool getBool(const string& strSection, const string& strKey);
     bool getBool(const string& strKey);
@@ -31,18 +28,21 @@ public: // inner classes
     class no_such_key_exception: public logic_error
     {
     public:
-        no_such_key_exception(): logic_error("No such key exception!\n"){}
+        no_such_key_exception(): logic_error("No such key exception!"){}
         no_such_key_exception(const string& message): logic_error(message){}
     };
 
     class invalid_format_exception: public logic_error
     {
     public:
-        invalid_format_exception(): logic_error("The format of the ini file is invalid!\n"){}
+        invalid_format_exception(): logic_error("The format of the ini file is invalid!"){}
         invalid_format_exception(const string& message): logic_error(message){}
     };
 
-private: // methods
+private: // methods   
+    const string& getValue(const string& section, const string& strKey);
+    const string& getValue(const string& strKey);
+
     void handleKeyValueAssigment(const string& strKeyValueAssigment);
     void handleSection(const string& strSection);
 

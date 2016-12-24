@@ -9,7 +9,7 @@ using namespace std;
 
 IniParser::IniParser(bool skipInvalidLines)
 {
-    // comments can either start with ; or #:  ;;;this is a coomment
+    // comments can either start with ; or #:  ;;;this is a comment
     regexComment = regex("(\\s*?)(;|#)(.*)", regex::ECMAScript);
 
     // sections are placed between square brackets:  [Section.SubSection... and so on]

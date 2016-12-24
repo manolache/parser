@@ -15,7 +15,10 @@ private: // unit tests
     bool testEmptyFile();
     bool testKeyValueAssigments();
     bool testKeyValueAssigmentsUpdate();
-    
+    bool testNoSuchKeyException();
+    bool testInvalidFormatException();
+    bool testReset();
+
 private: // atributes
     IniParser   m_iniParser;
     string      m_strEmptyFile;
