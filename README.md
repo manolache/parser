@@ -1,6 +1,7 @@
+UTF-8, ubuntu, gnu compiler
 comments on separates lines only
-alloows keys withouys sections
+alloows keys without sections
 allow duplicate sections
-throw exceptions on error
-skip invalid lines
+overwrites keys
+can skip invalid lines
 case sensitive

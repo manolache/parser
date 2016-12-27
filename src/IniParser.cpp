@@ -7,24 +7,52 @@
 
 using namespace std;
 
-IniParser::IniParser(bool skipInvalidLines)
+#define OP_COMMENT1             ';'
+#define OP_COMMENT2             '#'
+#define OP_ASSIGN               '='
+#define OP_SECTION_START        "["
+#define OP_SECTION_END          "]"
+#define OP_SECTION_KEY_CAT      '.'
+
+#define REG_SPACES              "([\\s|\\t]*)" 
+
+IniParser::IniParser(bool bSkipInvalidLines)
 {
-    // comments can either start with ; or #:  ;;;this is a comment
-    regexComment = regex("(\\s*?)(;|#)(.*)", regex::ECMAScript);
+    m_bSkipInvalidLines = bSkipInvalidLines;
+
+    stringstream stream;
+
+    // comments can either start with ; or #
+    stream << REG_SPACES;                                           // spaces
+    stream << '(' << OP_COMMENT1 << '|' << OP_COMMENT2 << ")";      // ; or #
+    stream << "(.*)";                                               // anything
+    m_regexComment = regex(stream.str(), regex::ECMAScript);
 
     // sections are placed between square brackets:  [Section.SubSection... and so on]
-    regexSection = regex("(\\s*?)\\[[^\\]\\r\\n]+](\\s*?)", regex::ECMAScript);
-
-    // operator = is used to assign values to keys
-    regexKeyValueAssigment = regex("(\\s*?)(_*[a-z|A-Z][a-z|A-Z|0-9|_]*)([\\s|\\t]*?)=([^;\\r\\n]*)", regex::ECMAScript);
-
-    bSkipInvalidLines = skipInvalidLines;
-
-    reset();
+    stream.str("");
+    stream.clear();   
+    stream << REG_SPACES;                                           // spaces
+    stream << "\\" << OP_SECTION_START;                             // operator start section
+    stream << "[^" << "\\" << OP_SECTION_END << "\\r\\n]+";         // anything but ], tabs or new line
+    stream << OP_SECTION_END;                                       // operator end section
+    stream << REG_SPACES;                                           // spaces once again
+    m_regexSection = regex(stream.str(), regex::ECMAScript);
+    
+    // key value assigment
+    stream.str("");
+    stream.clear();
+    stream << REG_SPACES;                                           // spaces
+    stream << "(_*[a-z|A-Z][_|a-z|A-Z|0-9]*)";                      // _ repeat letter  digit or letter or _ repeat
+    stream << REG_SPACES;
+    stream << OP_ASSIGN;                                            // assign operator
+    stream << "([^;\\r\\n]*)";                                      // anything except ; tabs or new line
+    m_regexKeyValueAssigment = regex(stream.str(), regex::ECMAScript);
+    
+    clear();
 }
 
 // just delegate the default constructor and process the file
-IniParser::IniParser(const string &strFileName, bool skipInvalidLines) : IniParser(skipInvalidLines)
+IniParser::IniParser(const string &strFileName, bool bSkipInvalidLines) : IniParser(bSkipInvalidLines)
 {
     updateFromFile(strFileName);
 }
@@ -35,6 +63,7 @@ int IniParser::updateFromFile(const string &strFileName)
     if (strFileName.empty())
         throw invalid_argument("The input file name is empty!");
 
+    // open file to read from
     ifstream ifs(strFileName, std::ifstream::in);
 
     // check if file was open
@@ -42,7 +71,7 @@ int IniParser::updateFromFile(const string &strFileName)
         throw invalid_argument("Unable to open the input file " + strFileName);
 
     // start with an empty section
-    strCurrentSection = "";
+    m_strCurrentSection = "";
 
     logInfo("reading " + strFileName);
     while (!ifs.eof())
@@ -60,17 +89,17 @@ int IniParser::updateFromFile(const string &strFileName)
         }
 
         smatch matcher;
-        try
-        {
+        try {
             // skip comments
-            if (regex_match(strLine, matcher, regexComment))
+            if (regex_match(strLine, matcher, m_regexComment))
             {
                 logInfo("matched comment: " + trim(matcher[0]));
-                continue; // for inline comments, instead of 'continue', just extract the comment and continue processing
+                // TODO: for inline comments, instead of 'continue', just extract the comment and continue processing
+                continue; 
             }
 
             // match section
-            if (regex_match(strLine, matcher, regexSection))
+            if (regex_match(strLine, matcher, m_regexSection))
             {
                 logInfo("matched section: " + trim(matcher[0]));
                 handleSection(trim(matcher[0]));
@@ -78,22 +107,20 @@ int IniParser::updateFromFile(const string &strFileName)
             }
 
             // match key value assigment
-            if (regex_match(strLine, matcher, regexKeyValueAssigment))
+            if (regex_match(strLine, matcher, m_regexKeyValueAssigment))
             {
                 logInfo("matched key value assigment: " + trim(matcher[0]));
                 handleKeyValueAssigment(trim(matcher[0]));
                 continue;
             }
-        }
-        catch (const regex_error &ex) {
+        } catch (const regex_error &ex) {
             logError("regex exceptrion");
             return -1;
         }
 
-        if (bSkipInvalidLines) {
+        if (m_bSkipInvalidLines) {
             logInfo("matched invalid line, skipping: " + strLine);
-        }
-        else {
+        } else {
             logError("matched invalid line, skipping: " + strLine);
             throw invalid_format_exception("matched invalid line: " + strLine);
         }
@@ -108,48 +135,41 @@ int IniParser::updateFromFile(const string &strFileName)
     return 0;
 }
 
-void IniParser::reset()
-{
-    values.clear();
-    strCurrentSection = "";
+size_t IniParser::size() const {
+    return m_values.size();
 }
 
-size_t IniParser::getNoOfValues() const {
-    return values.size();
+void IniParser::clear()
+{
+    m_values.clear();
+    m_strCurrentSection = "";
 }
 
-const string &IniParser::getValue(const string &strKey)
+const string &IniParser::getValue(const string &strKey, const string &strSection) const
 {
-    return getValue("", strKey);
-}
+    if (strKey.empty())
+        throw invalid_argument("The find key is empty!");
 
-const string &IniParser::getValue(const string &strSection, const string &strKey)
-{
-
-    string findKey = strKey;
+    string strFindKey = strKey;
 
     if (!strSection.empty())
-        findKey = strSection + '.' + findKey;
+        strFindKey = strSection + OP_SECTION_KEY_CAT + strFindKey;
 
-    map<string, string>::const_iterator it = values.find(findKey);
-    if (it == values.end())
+    map<string, string>::const_iterator it = m_values.find(strFindKey);
+    if (it == m_values.end())
         throw IniParser::no_such_key_exception();
 
     return it->second;
 }
 
-// throws no_such_key_exception
-string IniParser::getString(const string &strSection, const string &strKey)
+string IniParser::getString(const string &strKey, const string &strSection) const
 {
-    return getValue(strSection, strKey);
+    return getValue(strKey, strSection);
 }
 
-// throws no_such_key_exception, invalid_format_exception
-int IniParser::getInt(const string &strSection, const string &strKey)
+int IniParser::getInt(const string &strKey, const string &strSection) const
 {
-
-    string strValue = getValue(strSection, strKey);
-    stringstream stream(strValue);
+    stringstream stream(getValue(strKey, strSection));
 
     int integer;
     if (!(stream >> integer))
@@ -158,9 +178,9 @@ int IniParser::getInt(const string &strSection, const string &strKey)
     return integer;
 }
 
-bool IniParser::getBool(const string &strSection, const string &strKey)
+bool IniParser::getBool(const string &strKey, const string &strSection) const
 {
-    string strValue = getValue(strSection, strKey);
+    string strValue = getValue(strKey, strSection);
 
     if (strValue == "true")
         return true;
@@ -177,24 +197,23 @@ void IniParser::handleSection(const string &strSection)
     assert(strSection.length() >= 2);
 
     // remove the [ ] and trim once again
-    strCurrentSection = trim(strSection.substr(1, strSection.length() - 2));
+    m_strCurrentSection = trim(strSection.substr(1, strSection.length() - 2));
 }
 
 void IniParser::handleKeyValueAssigment(const string &strKeyValueAssigment)
 {
+    unsigned int pos = strKeyValueAssigment.find(OP_ASSIGN);
 
-    unsigned int pos = strKeyValueAssigment.find('=');
-
-    // TODO: assert here
+    assert(0 < pos && pos < strKeyValueAssigment.length());
 
     string key = trim(strKeyValueAssigment.substr(0, pos - 1));
     string value = trim(strKeyValueAssigment.substr(pos + 1, strKeyValueAssigment.length()));
 
-    if (!strCurrentSection.empty())
-        key = strCurrentSection + '.' + key;
+    if (!m_strCurrentSection.empty())
+        key = m_strCurrentSection + OP_SECTION_KEY_CAT + key;
 
-    // add or overwrite
-    values[key] = value;
+    // XXX: add or overwrite
+    m_values[key] = value;
 }
 
 string IniParser::trim(const string &s)
@@ -213,8 +232,8 @@ string IniParser::trim(const string &s)
 void IniParser::logValues()
 {
 #ifdef DEBUG
-    clog << values.size() << " values:\n";
-    for (auto it = values.begin(); it != values.end(); ++it)
+    clog << m_values.size() << " values:\n";
+    for (auto it = m_values.begin(); it != m_values.end(); ++it)
         clog << it->first << " = " << it->second << '\n';
 #endif
 }

@@ -22,7 +22,7 @@ IniParserTestSuite::IniParserTestSuite(string strEmptyFile, string strFirstFile,
 
 bool IniParserTestSuite::runTests() {
     
-    m_iniParser.reset();
+    m_iniParser.clear();
 
     bool bReturn = testInvalidPath();
     bReturn = bReturn && testEmptyFile();
@@ -30,7 +30,7 @@ bool IniParserTestSuite::runTests() {
     bReturn = bReturn && testKeyValueAssigmentsUpdate();
     bReturn = bReturn && testNoSuchKeyException();
     bReturn = bReturn && testInvalidFormatException();
-    
+
     return bReturn;
 }
 
@@ -64,7 +64,7 @@ bool IniParserTestSuite::testEmptyFile() {
     cout << "Testing the .INI parser with an empty file...\n";
     
     // hold the current no of values
-    size_t noOfValues = m_iniParser.getNoOfValues();
+    size_t noOfValues = m_iniParser.size();
 
     try {
         // try with empty file
@@ -84,7 +84,7 @@ bool IniParserTestSuite::testEmptyFile() {
     }
 
     // empty files should not affect the number of values
-    if (noOfValues != m_iniParser.getNoOfValues()){
+    if (noOfValues != m_iniParser.size()){
         cout << "[Failed]\n";
         return false;
     } 
@@ -97,7 +97,7 @@ bool IniParserTestSuite::testKeyValueAssigments() {
     cout << "Testing the .INI parser with the first file...\n";
        
     // expects 0 values
-    if (0 != m_iniParser.getNoOfValues()) {
+    if (0 != m_iniParser.size()) {
         cout << "[Failed]\n";
         return false;             
     }
@@ -120,53 +120,53 @@ bool IniParserTestSuite::testKeyValueAssigments() {
     }
    
     // expect 9 values
-    if (9 != m_iniParser.getNoOfValues()) {
+    if (9 != m_iniParser.size()) {
         cout << "[Failed]\n";
         return false;             
     }
     
     try {          
-        if (m_iniParser.getString("details.about", "city") != "bucharest") {
+        if (m_iniParser.getString("city", "details.about") != "bucharest") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("details.about", "country") != "romania") {
+        if (m_iniParser.getString("country", "details.about") != "romania") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getBool("details.about", "isNice")){
+        if (m_iniParser.getBool("isNice", "details.about")){
             cout << "[Failed]\n";
             return false;         
         }
 
-        if (m_iniParser.getString("details.about", "lastname") != "manolache") {
+        if (m_iniParser.getString("lastname", "details.about") != "manolache") {
             cout << "[Failed]\n";
             return false; 
         }
         
-        if (m_iniParser.getString("details.about", "name") != "ionut") {
+        if (m_iniParser.getString("name", "details.about") != "ionut") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getInt("", "key") != 7) {
+        if (m_iniParser.getInt("key") != 7) {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("", "lake") != "\"\"") {
+        if (m_iniParser.getString("lake") != "\"\"") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("", "river") != "") {
+        if (m_iniParser.getString("river") != "") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("section", "key") != "some string with spaces") {
+        if (m_iniParser.getString("key", "section") != "some string with spaces") {
             cout << "[Failed]\n";
             return false; 
         }        
@@ -188,7 +188,7 @@ bool IniParserTestSuite::testKeyValueAssigmentsUpdate() {
     cout << "Testing the .INI parser with the update file...\n";
     
     // expect 9 values from the first file
-    if (9 != m_iniParser.getNoOfValues()) {
+    if (9 != m_iniParser.size()) {
         cout << "[Failed]\n";
         return false;             
     }
@@ -211,18 +211,18 @@ bool IniParserTestSuite::testKeyValueAssigmentsUpdate() {
     }
     
     // expects 10 values
-    if (10 != m_iniParser.getNoOfValues()) {
+    if (10 != m_iniParser.size()) {
         cout << "[Failed]\n";
         return false;             
     }
 
     try {
-        if (m_iniParser.getString("", "company") != "eset") {
+        if (m_iniParser.getString("company") != "eset") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (!m_iniParser.getBool("details.about", "isNice")){
+        if (!m_iniParser.getBool("isNice", "details.about")){
             cout << "[Failed]\n";
             return false;         
         }
@@ -245,7 +245,7 @@ bool IniParserTestSuite::testNoSuchKeyException() {
     cout << "Testing the no scuh key exception...\n";
 
     try {
-        if (m_iniParser.getString("some section", "some key") != "some value") {
+        if (m_iniParser.getString("some key", "some section") != "some value") {
             cout << "[Failed]\n";
             return false; 
         }
@@ -263,7 +263,7 @@ bool IniParserTestSuite::testInvalidFormatException() {
     cout << "Testing the invalid format exception...\n";
 
     try {
-        if (m_iniParser.getInt("details.about", "name") != 999) {
+        if (m_iniParser.getInt("name", "details.about") != 999) {
             cout << "[Failed]\n";
             return false; 
         }
