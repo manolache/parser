@@ -6,7 +6,9 @@
 
 using namespace std;
 
-IniParserTestSuite::IniParserTestSuite(string strEmptyFile, string strFirstFile, string strUpdateFile)
+IniParserTestSuite::IniParserTestSuite(const string& strEmptyFile, 
+									   const string& strFirstFile,
+									   const string& strUpdateFile)
     : m_strEmptyFile(strEmptyFile),
       m_strFirstFile(strFirstFile),
       m_strUpdateFile(strUpdateFile)

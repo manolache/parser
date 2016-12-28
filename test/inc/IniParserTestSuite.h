@@ -8,7 +8,9 @@ using namespace std;
 
 class IniParserTestSuite {
 public: // methods
-    IniParserTestSuite(string strEmptyFile, string strFirstFile, string strUpdateFile);
+    IniParserTestSuite(const string& strEmptyFile, 
+					   const string& strFirstFile, 
+					   const string& strUpdateFile);
     bool runTests();
 
 private: // unit tests

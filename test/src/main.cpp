@@ -10,9 +10,7 @@ int main(int argc, char* args[]) {
         return -1;
     }
 
-    IniParserTestSuite testSuite(string(args[1], strlen(args[1])), 
-                                 string(args[2], strlen(args[2])), 
-                                 string(args[3], strlen(args[3])));
+	IniParserTestSuite testSuite(args[1], args[2], args[3]);
     if (!testSuite.runTests()) {
         cout << "One or more tests failed\n";
         return -1;
