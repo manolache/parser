@@ -30,6 +30,7 @@ bool IniParserTestSuite::runTests() {
     bReturn = bReturn && testKeyValueAssigmentsUpdate();
     bReturn = bReturn && testNoSuchKeyException();
     bReturn = bReturn && testInvalidFormatException();
+    bReturn = bReturn && testClear();
 
     return bReturn;
 }
@@ -279,4 +280,19 @@ bool IniParserTestSuite::testInvalidFormatException() {
 
     cout << "[Failed]\n";
     return false;         
+}
+
+
+bool IniParserTestSuite::testClear(){
+    cout << "Testing the clear operation...\n";
+	
+	m_iniParser.clear();
+
+	if (m_iniParser.size() != 0) {
+        cout << "[Failed]\n";
+        return false;         	
+	}
+
+	cout << "[Passed]\n";
+	return true;         	
 }

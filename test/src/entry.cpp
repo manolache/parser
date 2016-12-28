@@ -13,11 +13,11 @@ int main(int argc, char* args[]) {
     IniParserTestSuite testSuite(string(args[1], strlen(args[1])), 
                                  string(args[2], strlen(args[2])), 
                                  string(args[3], strlen(args[3])));
-    if (testSuite.runTests()) {
-        cout << "Looks good\n";
-    } else {
-        cout << "One or more tests failed\n";        
-    }
-
+    if (!testSuite.runTests()) {
+        cout << "One or more tests failed\n";
+        return -1;
+    } 
+    
+    cout << "Looks good\n";
     return 0;
 }

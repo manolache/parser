@@ -26,17 +26,17 @@ IniParser::IniParser(bool bSkipInvalidLines)
     stream << REG_SPACES;                                           // spaces
     stream << '(' << OP_COMMENT1 << '|' << OP_COMMENT2 << ")";      // ; or #
     stream << "(.*)";                                               // anything
-    m_regexComment = regex(stream.str(), regex::ECMAScript);
+    m_regexComment = regex(stream.str(), regex::ECMAScript);		// posix
 
     // sections are placed between square brackets:  [Section.SubSection... and so on]
     stream.str("");
     stream.clear();   
     stream << REG_SPACES;                                           // spaces
     stream << "\\" << OP_SECTION_START;                             // operator start section
-    stream << "[^" << "\\" << OP_SECTION_END << "\\r\\n]+";         // anything but ], tabs or new line
+    stream << "[^" << "\\" << OP_SECTION_END << "\\r\\n]+";         // anything but ] or line breaks
     stream << OP_SECTION_END;                                       // operator end section
     stream << REG_SPACES;                                           // spaces once again
-    m_regexSection = regex(stream.str(), regex::ECMAScript);
+    m_regexSection = regex(stream.str(), regex::ECMAScript);		// posix
     
     // key value assigment
     stream.str("");
@@ -45,14 +45,15 @@ IniParser::IniParser(bool bSkipInvalidLines)
     stream << "(_*[a-z|A-Z][_|a-z|A-Z|0-9]*)";                      // _ repeat letter  digit or letter or _ repeat
     stream << REG_SPACES;
     stream << OP_ASSIGN;                                            // assign operator
-    stream << "([^;\\r\\n]*)";                                      // anything except ; tabs or new line
-    m_regexKeyValueAssigment = regex(stream.str(), regex::ECMAScript);
+    stream << "([^;\\r\\n]*)";                                      // anything except ; or line breaks
+    m_regexKeyValueAssigment = regex(stream.str(), regex::ECMAScript); //posix
     
     clear();
 }
 
 // just delegate the default constructor and process the file
-IniParser::IniParser(const string &strFileName, bool bSkipInvalidLines) : IniParser(bSkipInvalidLines)
+IniParser::IniParser(const string &strFileName, bool bSkipInvalidLines) 
+	: IniParser(bSkipInvalidLines)
 {
     updateFromFile(strFileName);
 }
@@ -114,7 +115,7 @@ int IniParser::updateFromFile(const string &strFileName)
                 continue;
             }
         } catch (const regex_error &ex) {
-            logError("regex exceptrion");
+            logError("regex exception");
             return -1;
         }
 

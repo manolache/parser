@@ -4,7 +4,8 @@
 
 using namespace std;
 
-// this is a lasy way to excersite the IniParser
+// this is a lazy  way to excersite the IniParser
+
 class IniParserTestSuite {
 public: // methods
     IniParserTestSuite(string strEmptyFile, string strFirstFile, string strUpdateFile);
@@ -17,7 +18,7 @@ private: // unit tests
     bool testKeyValueAssigmentsUpdate();
     bool testNoSuchKeyException();
     bool testInvalidFormatException();
-    bool testReset();
+    bool testClear();
 
 private: // atributes
     IniParser   m_iniParser;

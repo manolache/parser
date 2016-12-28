@@ -1,7 +1,8 @@
-UTF-8, ubuntu, gnu compiler
-comments on separates lines only
+case sensitive, UTF-8, ubuntu, gnu compiler, x86
+
+supports comments on separates lines only
 alloows keys without sections
-allow duplicate sections
+merges duplicate sections
 overwrites keys
-can skip invalid lines
-case sensitive
+skips invalid lines
+supports unset variables, returns empty string
