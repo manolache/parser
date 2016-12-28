@@ -8,7 +8,8 @@
 
 # output 
 APP_NAME := iniparser
-LIB_NAME := libiniparser.so 
+LIB_NAME := libiniparser.so
+DIR_INSTALL := /usr/local/bin
 
 # app root directory
 DIR_APP_ROOT = ./app
@@ -152,8 +153,16 @@ $(TEST_LINK_TARGET): $(TEST_OBJECTS)
 #==========================================================#
 # PHONY targets
 #==========================================================#
+.PHONY : install
+install : $(LINK_TARGET)
+	@echo Installing $< ...
+	cp $< $(DIR_INSTALL)
+
+.PHONY : uninstall
+uninstall:
+	@echo Uninstalling ...
+	rm -f $(DIR_INSTALL)/$(APP_NAME)
+
 .PHONY : clean
 clean :
-	rm -f $(OBJECTS) $(DEPS) $(LINK_TARGET)
-	rm -f $(TEST_OBJECTS) $(TEST_DEPS) $(TEST_LINK_TARGET)
-#==========================================================#
+	rm -f $(OBJECTS) $(DEPS) $(LINK_TARGET) $(TEST_OBJECTS) $(TEST_DEPS) $(TEST_LINK_TARGET)
