@@ -87,7 +87,7 @@ bool IniParserTestSuite::testEmptyFile() {
     }
 
     // empty files should not affect the number of values
-    if (noOfValues != m_iniParser.size()){
+    if (noOfValues != m_iniParser.size()) {
         cout << "[Failed]\n";
         return false;
     } 
@@ -285,7 +285,7 @@ bool IniParserTestSuite::testInvalidFormatException() {
 }
 
 
-bool IniParserTestSuite::testClear(){
+bool IniParserTestSuite::testClear() {
     cout << "Testing the clear operation...\n";
 	
 	m_iniParser.clear();
