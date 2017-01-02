@@ -33,13 +33,13 @@ public: // methods
      */         
     ~IniParser() {};
 
-    
     /*
      * updates the internal representation by appending the values from the ini file
      * @param strFileName - specifies the path to the ini file
      * @throws invalid_argument - if the path is invalid
      * @throws invalid_format_exception - if the parser matches an invalid line
-     * @return 0 for success and negative value for error
+     * @throws runtime_error - if the parser cannot load values anymore due to memory or some other limitations
+	 * @return 0 for success and negative value for error
      */         
     int updateFromFile(const string& strFileName);
     
@@ -47,6 +47,11 @@ public: // methods
      * @return the number of values stored so far
      */         
     size_t size() const;
+    
+    /*
+     * @return the maximum number of values the parser can store
+     */         
+	size_t max_size() const;
     
     /*
      * clears all the values stored so far
@@ -94,27 +99,27 @@ public: // methods
     bool getBool(const string& strKey, const string& strSection = "") const;
 
 public: // inner classes
-    class no_such_key_exception: public logic_error
+    class no_such_key_exception: public runtime_error
     {
     public:
         no_such_key_exception()
-            : logic_error("No such key exception!")
+            : runtime_error("No such key exception!")
         {}
         
         no_such_key_exception(const string& message)
-            : logic_error(message)
+            : runtime_error(message)
         {}
     };
 
-    class invalid_format_exception: public logic_error
+    class invalid_format_exception: public runtime_error
     {
     public:
         invalid_format_exception()
-            : logic_error("The format is invalid!")
+            : runtime_error("The format is invalid!")
         {}
 
         invalid_format_exception(const string& message)
-            : logic_error(message)
+            : runtime_error(message)
         {}
     };
 

@@ -53,10 +53,18 @@ bool IniParserTestSuite::testInvalidPath() {
             cout << "[Failed]\n";
             return false;             
         }
-    } catch (invalid_argument ex) {
+    } catch (const invalid_argument& ex) {
         cout << ex.what() << endl;
-        cout << "[Passed]\n";
+        cout << "[Passed]\n";			// expect invalid argument exception
         return true; 
+    } catch (const IniParser::invalid_format_exception& ex) {
+        cout << ex.what() << endl;
+        cout << "[Failed]\n";
+        return false; 
+    } catch (const runtime_error& ex) {
+        cout << ex.what() << endl;
+        cout << "[Failed]\n";
+        return false; 
     }
 
     cout << "[Failed]\n";
@@ -76,11 +84,15 @@ bool IniParserTestSuite::testEmptyFile() {
             cout << "[Failed]\n";
             return false;             
         }
-    } catch (invalid_argument ex) {
+    } catch (const invalid_argument& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
+        cout << ex.what() << endl;
+        cout << "[Failed]\n";
+        return false; 
+    } catch (const runtime_error& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
@@ -112,11 +124,15 @@ bool IniParserTestSuite::testKeyValueAssigments() {
             cout << "[Failed]\n";
             return false;             
         }
-    } catch (invalid_argument ex) {
+    } catch (const invalid_argument& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
+        cout << ex.what() << endl;
+        cout << "[Failed]\n";
+        return false; 
+    } catch (const runtime_error& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
@@ -173,11 +189,11 @@ bool IniParserTestSuite::testKeyValueAssigments() {
             cout << "[Failed]\n";
             return false; 
         }        
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false;         
-    } catch (IniParser::no_such_key_exception ex) {
+    } catch (const IniParser::no_such_key_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false;         
@@ -203,11 +219,15 @@ bool IniParserTestSuite::testKeyValueAssigmentsUpdate() {
             cout << "[Failed]\n";
             return false;             
         }
-    } catch (invalid_argument ex) {
+    } catch (const invalid_argument& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
+        cout << ex.what() << endl;
+        cout << "[Failed]\n";
+        return false; 
+    } catch (const runtime_error& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false; 
@@ -229,11 +249,11 @@ bool IniParserTestSuite::testKeyValueAssigmentsUpdate() {
             cout << "[Failed]\n";
             return false;         
         }
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false;         
-    } catch (IniParser::no_such_key_exception ex) {
+    } catch (const IniParser::no_such_key_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false;         
@@ -252,7 +272,7 @@ bool IniParserTestSuite::testNoSuchKeyException() {
             cout << "[Failed]\n";
             return false; 
         }
-    } catch (IniParser::no_such_key_exception ex) {
+    } catch (const IniParser::no_such_key_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Passed]\n";
         return true;         
@@ -270,11 +290,11 @@ bool IniParserTestSuite::testInvalidFormatException() {
             cout << "[Failed]\n";
             return false; 
         }
-    } catch (IniParser::invalid_format_exception ex) {
+    } catch (const IniParser::invalid_format_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Passed]\n";
         return true;         
-    } catch (IniParser::no_such_key_exception ex) {
+    } catch (const IniParser::no_such_key_exception& ex) {
         cout << ex.what() << endl;
         cout << "[Failed]\n";
         return false;         

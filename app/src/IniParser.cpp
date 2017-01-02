@@ -28,24 +28,26 @@ IniParser::IniParser(bool bSkipInvalidLines)
     stream << "(.*)";                                               // anything
     m_regexComment = regex(stream.str(), regex::ECMAScript);		// posix
 
-    // sections are placed between square brackets:  [Section.SubSection... and so on]
     stream.str("");
     stream.clear();   
+
+    // sections are placed between square brackets:  [Section.SubSection... and so on]
     stream << REG_SPACES;                                           // spaces
     stream << "\\" << OP_SECTION_START;                             // operator start section
-    stream << "[^" << "\\" << OP_SECTION_END << "\\r\\n]+";         // anything but ] or line breaks
+    stream << "[^" << "\\" << OP_SECTION_END << "\\r\\n]+";         // anything except ] or line breaks
     stream << OP_SECTION_END;                                       // operator end section
     stream << REG_SPACES;                                           // spaces once again
     m_regexSection = regex(stream.str(), regex::ECMAScript);		// posix
     
-    // key value assigment
     stream.str("");
     stream.clear();
+    
+	// key value assigment
     stream << REG_SPACES;                                           // spaces
     stream << "(_*[a-z|A-Z][_|a-z|A-Z|0-9]*)";                      // _ repeat letter  digit or letter or _ repeat
     stream << REG_SPACES;
     stream << OP_ASSIGN;                                            // assign operator
-    stream << "([^;\\r\\n]*)";                                      // anything except ; or line breaks
+    stream << "([^\\r\\n]*)";                                       // anything except line breaks
     m_regexKeyValueAssigment = regex(stream.str(), regex::ECMAScript); //posix
     
     clear();
@@ -122,7 +124,7 @@ int IniParser::updateFromFile(const string &strFileName)
         if (m_bSkipInvalidLines) {
             logInfo("matched invalid line, skipping: " + strLine);
         } else {
-            logError("matched invalid line, skipping: " + strLine);
+            logError("matched invalid line: " + strLine);
             throw invalid_format_exception("matched invalid line: " + strLine);
         }
     }
@@ -138,6 +140,11 @@ int IniParser::updateFromFile(const string &strFileName)
 
 size_t IniParser::size() const {
     return m_values.size();
+}
+
+
+size_t IniParser::max_size() const {
+    return m_values.max_size();
 }
 
 void IniParser::clear()
@@ -213,21 +220,29 @@ void IniParser::handleKeyValueAssigment(const string &strKeyValueAssigment)
     if (!m_strCurrentSection.empty())
         key = m_strCurrentSection + OP_SECTION_KEY_CAT + key;
 
-    // XXX: add or overwrite
-    m_values[key] = value;
+	try	{
+    	// insert or overwrite - throws exception if the insert fails
+		// the documentation is quite vague and it doesn't say what exception is thrown.
+		// catching const reference to exception to prevent slicing
+		// throw a runtime error with verbose details so the user can gracefully handle this
+	    m_values[key] = value;
+	} catch (const exception& ex) {
+		logError(string("Unable to insert values into map") + ex.what());
+		throw runtime_error("Unable to load values! Max capacity is " + max_size());
+	}
 }
 
 string IniParser::trim(const string &s)
 {
-    string::const_iterator it = s.begin();
-    while (it != s.end() && isspace(*it))
-        it++;
+    string::const_iterator lit = s.begin();
+    while (lit != s.end() && isspace(*lit))
+        lit++;
 
     string::const_reverse_iterator rit = s.rbegin();
-    while (rit.base() != it && isspace(*rit))
+    while (lit != rit.base() && isspace(*rit))
         rit++;
 
-    return string(it, rit.base());
+    return string(lit, rit.base());
 }
 
 void IniParser::logValues()

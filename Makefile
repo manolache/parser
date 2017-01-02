@@ -27,8 +27,8 @@ DIR_TMP := $(DIR_APP_ROOT)/tmp
 DIR_LIBRARIES := 
 
 # convenient variables
-LINK_TARGET := $(DIR_OUTPUT)/$(APP_NAME)
-LINK_TARGET_LIB := $(DIR_OUTPUT)/$(LIB_NAME)
+BINARY_EXE := $(DIR_OUTPUT)/$(APP_NAME)
+BINARY_LIB := $(DIR_OUTPUT)/$(LIB_NAME)
 INCLUDES := -I$(DIR_INCLUDE)
 ADDITIONAL_INCLUDES :=
 CPPSOURCES := $(wildcard $(DIR_SOURCES)/*.cpp)
@@ -61,7 +61,7 @@ DIR_TEST_TMP := $(DIR_TEST_ROOT)/tmp
 DIR_TEST_LIBRARIES := $(DIR_OUTPUT) 
 
 # convenient variables
-TEST_LINK_TARGET := $(DIR_TEST_OUTPUT)/$(TEST_APP_NAME)
+TEST_BINARY_EXE := $(DIR_TEST_OUTPUT)/$(TEST_APP_NAME)
 TEST_INCLUDES := -I$(DIR_TEST_INCLUDE)
 TEST_ADDITIONAL_INCLUDES := -I$(DIR_INCLUDE)
 TEST_CPPSOURCES := $(wildcard $(DIR_TEST_SOURCES)/*.cpp)
@@ -79,9 +79,9 @@ CXX := g++
 #compile flags
 CXXFLAGS := -std=c++14 -Wall -g -DDEBUG -fpic
 
-#link flags
-LDFLAGS = -lm
-TEST_LDFLAGS = -lm -l$(APP_NAME)
+#link flags - the linker needs the app as library
+LDFLAGS := -lm
+TEST_LDFLAGS := -lm -l$(APP_NAME)
 #==========================================================#
 
 
@@ -89,50 +89,29 @@ TEST_LDFLAGS = -lm -l$(APP_NAME)
 # rules
 #==========================================================#
 
-all: deps deps-test build build-test test
-
-dirs:
-	mkdir -p $(DIR_INCLUDE)
-	mkdir -p $(DIR_SOURCES)
-	mkdir -p $(DIR_TMP)
-	mkdir -p $(DIR_OUTPUT)
-	mkdir -p $(DIR_RESOURCES)
-
-dirs-test:
-	mkdir -p $(DIR_TEST_INCLUDE)
-	mkdir -p $(DIR_TEST_SOURCES)
-	mkdir -p $(DIR_TEST_TMP)
-	mkdir -p $(DIR_TEST_OUTPUT)
-	mkdir -p $(DIR_TEST_RESOURCES)
-
-deps: $(DEPS)
-deps-test: $(TEST_DEPS)
--include $(DEPS) $(TEST_DEPS)
-
-build: $(LINK_TARGET)
-
-build-test: $(LINK_TARGET_LIB) $(TEST_LINK_TARGET)
-
-test: build-test
-	@echo Running the unit tests...
-	@LD_LIBRARY_PATH=./app/out/ $(TEST_LINK_TARGET) ./test/res/empty.ini ./test/res/first.ini ./test/res/update.ini
-
 # generate app dependencies using the c++ preprocessor
-$(DIR_TMP)/%.d : $(DIR_SOURCES)/%.cpp
-	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ADDITIONAL_INCLUDES) -MM -MP -MT $(@:.d=.o) $< -MF $@ 
+$(DIR_TMP)/%.d : $(DIR_SOURCES)/%.cpp 
+	@echo Generating deps for $< ...
+	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ADDITIONAL_INCLUDES) -MM -MP -MT $(@:.d=.o) $< -MF $@
 
 # compile the application
-$(DIR_TMP)/%.o : $(DIR_SOURCES)/%.cpp
+$(DIR_TMP)/%.o : $(DIR_SOURCES)/%.cpp 
 	@echo Compiling $< ...
 	$(CXX) $(CXXFLAGS) $(INCLUDES) $(ADDITIONAL_INCLUDES) -c $< -o $@
 
 # link the application in executable format
-$(LINK_TARGET): $(OBJECTS)
-	@echo Linking $< ...
+$(BINARY_EXE): $(OBJECTS) 
+	@echo Linking $^ into $@ ...
 	$(CXX) $(DIR_LIBRARIES) $(LDFLAGS) $^ -o $@
+
+# link the application in shared library format
+$(BINARY_LIB): $(OBJECTS) 
+	@echo Linking $^ into $@ ...
+	$(CXX) $(DIR_LIBRARIES) $(LDFLAGS) -shared $^ -o $@
 
 # generate test dependencies using the c++ preprocessor
 $(DIR_TEST_TMP)/%.d : $(DIR_TEST_SOURCES)/%.cpp
+	@echo Generating deps for $< ...
 	$(CXX) $(CXXFLAGS) $(TEST_INCLUDES) $(TEST_ADDITIONAL_INCLUDES) -MM -MP -MT $(@:.d=.o) $< -MF $@ 
 
 # compile the test application
@@ -140,19 +119,54 @@ $(DIR_TEST_TMP)/%.o : $(DIR_TEST_SOURCES)/%.cpp
 	@echo Compiling $< ...
 	$(CXX) $(CXXFLAGS) $(TEST_INCLUDES) $(TEST_ADDITIONAL_INCLUDES) -c $< -o $@
 
-# link the application in shared library format
-$(LINK_TARGET_LIB): $(OBJECTS)
-	@echo Linking $< ...
-	$(CXX) $(DIR_LIBRARIES) $(LDFLAGS) -shared $^ -o $@
-
 # link the test application
-$(TEST_LINK_TARGET): $(TEST_OBJECTS)
-	@echo Linking $< ...
+$(TEST_BINARY_EXE): $(TEST_OBJECTS)
+	@echo Linking $^ into $@ ...
 	$(CXX) -L$(DIR_TEST_LIBRARIES) $(TEST_LDFLAGS) $^ -o $@
 
 #==========================================================#
 # PHONY targets
 #==========================================================#
+.PHONY : all
+all: | deps deps-test build build-test test
+
+.PHONY : build
+build: | deps $(BINARY_EXE) $(BINARY_LIB)
+
+.PHONY : build-test
+build-test: | deps-test build $(TEST_BINARY_EXE)
+
+.PHONY : deps
+deps:  $(DEPS)
+-include $(DEPS) 
+
+.PHONY : deps-test
+deps-test: $(TEST_DEPS)
+-include $(TEST_DEPS)
+
+.PHONY : test
+test: build-test
+	@echo Running the unit tests...
+	@LD_LIBRARY_PATH=$(DIR_OUTPUT) $(TEST_BINARY_EXE) ./test/res/empty.ini ./test/res/first.ini ./test/res/update.ini
+
+.PHONY : dirs
+dirs:
+	@echo Generatring the project structure...
+	mkdir -p $(DIR_INCLUDE)
+	mkdir -p $(DIR_SOURCES)
+	mkdir -p $(DIR_TMP)
+	mkdir -p $(DIR_OUTPUT)
+	mkdir -p $(DIR_RESOURCES)
+
+.PHONY : dirs-test
+dirs-test:
+	@echo Generatring the test project structure...
+	mkdir -p $(DIR_TEST_INCLUDE)
+	mkdir -p $(DIR_TEST_SOURCES)
+	mkdir -p $(DIR_TEST_TMP)
+	mkdir -p $(DIR_TEST_OUTPUT)
+	mkdir -p $(DIR_TEST_RESOURCES)
+
 .PHONY : install
 install : $(LINK_TARGET)
 	@echo Installing $< ...
@@ -165,4 +179,4 @@ uninstall:
 
 .PHONY : clean
 clean :
-	rm -f $(OBJECTS) $(DEPS) $(LINK_TARGET) $(TEST_OBJECTS) $(TEST_DEPS) $(TEST_LINK_TARGET)
+	rm -fv $(DEPS) $(OBJECTS) $(BINARY_EXE) $(BINARY_LIB) $(TEST_DEPS) $(TEST_OBJECTS) $(TEST_BINARY_EXE)
