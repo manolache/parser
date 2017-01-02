@@ -2,12 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C++ Launch",
+            "name": "Launch app",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/out/parser",
-            "args": ["res/empty.ini", "res/first.ini", "res/update.ini"],
-            "stopAtEntry": false,
+            "program": "${workspaceRoot}/app/out/iniparser",
+            "args": ["test/res/empty.ini", "test/res/first.ini", "test/res/update.ini"],
+            "stopAtEntry": true,
             "cwd": "${workspaceRoot}",
             "environment": [],
             "externalConsole": true,
@@ -20,11 +20,19 @@
                         "ignoreFailures": true
                     }
                 ]
-            },
-            "osx": {
-                "MIMode": "lldb"
-            },
-            "windows": {
+            }
+        },
+        {
+            "name": "Launch test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/test/out/test-iniparser",
+            "args": ["test/res/empty.ini", "test/res/first.ini", "test/res/update.ini"],
+            "stopAtEntry": true,
+            "cwd": "${workspaceRoot}",
+            "environment": [{"name": "LD_LIBRARY_PATH", "value": "app/out"}],
+            "externalConsole": true,
+            "linux": {
                 "MIMode": "gdb",
                 "setupCommands": [
                     {

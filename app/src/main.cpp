@@ -17,10 +17,13 @@ int main(int argc, char* args[]) {
 			}
 		} catch (invalid_argument ex) {
 			cout << ex.what() << endl;
-			return 0; 
+			return -1; 
 		} catch (IniParser::invalid_format_exception ex) {
 			cout << ex.what() << endl;
-			return 0; 
+			return -1; 
+		} catch (const runtime_error& ex) {
+			cout << ex.what() << endl;
+			return -1; 
 		}
 	}
     return 0;

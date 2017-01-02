@@ -3,23 +3,19 @@
 
 #include "IniParserTestSuite.h"
 
-
 using namespace std;
 
 IniParserTestSuite::IniParserTestSuite(const string& strEmptyFile, 
 									   const string& strFirstFile,
 									   const string& strUpdateFile)
-    : m_strEmptyFile(strEmptyFile),
+	: m_iniParser(true), 
+	  m_strEmptyFile(strEmptyFile),
       m_strFirstFile(strFirstFile),
       m_strUpdateFile(strUpdateFile)
 {
-    // helps debugging the test suite
     assert (strEmptyFile.length() != 0 
             && strFirstFile.length() != 0
             && strUpdateFile.length() != 0);
-
-    // build the ini parser with skip invalid lines capabilities
-    m_iniParser = IniParser(true); 
 }
 
 bool IniParserTestSuite::runTests() {

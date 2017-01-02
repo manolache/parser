@@ -10,7 +10,7 @@
 	"suppressTaskName": true,
 	"tasks": [
 		{
-			"taskName": "build",
+			"taskName": "build app",
 			"isBuildCommand": true,
 			"args": [
 				"build"
