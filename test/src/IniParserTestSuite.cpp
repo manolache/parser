@@ -3,6 +3,8 @@
 
 #include "IniParserTestSuite.h"
 
+#include "IniParserT.cpp" // it needs to include template specialisations... 
+
 using namespace std;
 
 IniParserTestSuite::IniParserTestSuite(const string& strEmptyFile, 
@@ -146,12 +148,12 @@ bool IniParserTestSuite::testKeyValueAssigments() {
             return false; 
         }
 
-        if (m_iniParser.getString("country", "details.about") != "romania") {
+        if (m_iniParser.getValueT<string>("country", "details.about") != "romania") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getBool("isNice", "details.about")){
+        if (m_iniParser.getValueT<bool>("isNice", "details.about")){
             cout << "[Failed]\n";
             return false;         
         }

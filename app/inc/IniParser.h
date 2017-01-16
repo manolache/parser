@@ -120,6 +120,27 @@ public: // methods
      */
     bool getBool(const string& strKey, const string& strSection = "") const;
 
+    /*
+     * gets the value associated to a specific key under a specific section
+     * @param strKey - specifies key to look after
+     * @param strSection - specifies section to look after
+     * @throws invalid_argument - if the key is empty
+     * @throws no_such_key_exception - if there is no value for the specified key
+     * @throws invalid_format_exception - if the value cannot be casted to the desired type
+     * @return the value in generic format
+     */
+    template <typename T>
+    T getValueT(const string& strKey, const string& strSection = "") const {
+
+        stringstream stream(getValue(strKey, strSection));
+
+        T t;
+        if (!(stream >> t))
+            throw IniParser::invalid_format_exception("The value assigned to " + strKey + " cannot be assigned to the type required!");
+        
+        return t;
+    }
+
 public: // inner classes
     class no_such_key_exception: public runtime_error
     {
