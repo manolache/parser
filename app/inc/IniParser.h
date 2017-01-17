@@ -79,47 +79,7 @@ public: // methods
      * clears all the values stored so far
      */
     void clear();
-    
-    /*
-     * gets the value associated to a specific key under a specific section
-     * @param strKey - specifies key to look after
-     * @param strSection - specifies section to look after
-     * @throws invalid_argument - if the key is empty
-     * @throws no_such_key_exception - if there is no value for the specified key
-     * @return const reference to the value in string format
-     */
-    const string& getValue(const string& strKey, const string& section = "") const;
-    
-    /*
-     * gets the value associated to a specific key under a specific section
-     * @param strKey - specifies key to look after
-     * @param strSection - specifies section to look after
-     * @throws invalid_argument - if the key is empty
-     * @throws no_such_key_exception - if there is no value for the specified key
-     * @return the value in string format
-     */
-    string getString(const string& strKey, const string& strSection = "") const;
-
-    /*
-     * gets the value associated to a specific key under a specific section
-     * @param strKey - specifies key to look after
-     * @param strSection - specifies section to look after
-     * @throws invalid_argument - if the key is empty
-     * @throws no_such_key_exception - if there is no value for the specified key
-     * @return the value in int format
-     */
-    int getInt(const string& strKey, const string& strSection = "") const;
-
-    /*
-     * gets the value associated to a specific key under a specific section
-     * @param strKey - specifies key to look after
-     * @param strSection - specifies section to look after
-     * @throws invalid_argument - if the key is empty
-     * @throws no_such_key_exception - if there is no value for the specified key
-     * @return the value in bool format
-     */
-    bool getBool(const string& strKey, const string& strSection = "") const;
-
+      
     /*
      * gets the value associated to a specific key under a specific section
      * @param strKey - specifies key to look after
@@ -157,6 +117,17 @@ public: // inner classes
     };
 
 private: // methods   
+
+    /*
+     * gets the value associated to a specific key under a specific section
+     * @param strKey - specifies key to look after
+     * @param strSection - specifies section to look after
+     * @throws invalid_argument - if the key is empty
+     * @throws no_such_key_exception - if there is no value for the specified key
+     * @return const reference to the value in string format
+     */
+    const string& getValue(const string& strKey, const string& section = "") const;
+
     /*
      * updates the internal representation by adding/updating a key
      * @param strKeyValueAssigment - a string that matches a key value assigment regex

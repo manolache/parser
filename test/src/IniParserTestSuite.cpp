@@ -143,7 +143,7 @@ bool IniParserTestSuite::testKeyValueAssigments() {
     }
     
     try {          
-        if (m_iniParser.getString("city", "details.about") != "bucharest") {
+        if (m_iniParser.getValueT<string>("city", "details.about") != "bucharest") {
             cout << "[Failed]\n";
             return false; 
         }
@@ -158,32 +158,32 @@ bool IniParserTestSuite::testKeyValueAssigments() {
             return false;         
         }
 
-        if (m_iniParser.getString("lastname", "details.about") != "manolache") {
+        if (m_iniParser.getValueT<string>("lastname", "details.about") != "manolache") {
             cout << "[Failed]\n";
             return false; 
         }
         
-        if (m_iniParser.getString("name", "details.about") != "ionut") {
+        if (m_iniParser.getValueT<string>("name", "details.about") != "ionut") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getInt("key") != 7) {
+        if (m_iniParser.getValueT<int>("key") != 7) {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("lake") != "\"\"") {
+        if (m_iniParser.getValueT<string>("lake") != "\"\"") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("river") != "") {
+        if (m_iniParser.getValueT<string>("river") != "") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (m_iniParser.getString("key", "section") != "some string with spaces") {
+        if (m_iniParser.getValueT<string>("key", "section") != "some string with spaces") {
             cout << "[Failed]\n";
             return false; 
         }        
@@ -238,12 +238,12 @@ bool IniParserTestSuite::testKeyValueAssigmentsUpdate() {
     }
 
     try {
-        if (m_iniParser.getString("company") != "eset") {
+        if (m_iniParser.getValueT<string>("company") != "eset") {
             cout << "[Failed]\n";
             return false; 
         }
 
-        if (!m_iniParser.getBool("isNice", "details.about")){
+        if (!m_iniParser.getValueT<bool>("isNice", "details.about")){
             cout << "[Failed]\n";
             return false;         
         }
@@ -266,7 +266,7 @@ bool IniParserTestSuite::testNoSuchKeyException() {
     cout << "Testing the no scuh key exception...\n";
 
     try {
-        if (m_iniParser.getString("some key", "some section") != "some value") {
+        if (m_iniParser.getValueT<string>("some key", "some section") != "some value") {
             cout << "[Failed]\n";
             return false; 
         }
@@ -284,7 +284,7 @@ bool IniParserTestSuite::testInvalidFormatException() {
     cout << "Testing the invalid format exception...\n";
 
     try {
-        if (m_iniParser.getInt("name", "details.about") != 999) {
+        if (m_iniParser.getValueT<int>("name", "details.about") != 999) {
             cout << "[Failed]\n";
             return false; 
         }

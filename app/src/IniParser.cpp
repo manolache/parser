@@ -185,35 +185,6 @@ const string &IniParser::getValue(const string &strKey, const string &strSection
     return it->second;
 }
 
-string IniParser::getString(const string &strKey, const string &strSection) const {
-
-    return getValue(strKey, strSection);
-}
-
-int IniParser::getInt(const string &strKey, const string &strSection) const {
-
-    stringstream stream(getValue(strKey, strSection));
-
-    int integer;
-    if (!(stream >> integer))
-        throw IniParser::invalid_format_exception("The value assigned to " + strKey + " is not an integer!");
-
-    return integer;
-}
-
-bool IniParser::getBool(const string &strKey, const string &strSection) const {
-
-    string strValue = getValue(strKey, strSection);
-
-    if (strValue == "true")
-        return true;
-    
-    if (strValue == "false")
-        return false;
-
-    throw IniParser::invalid_format_exception("The value assigned to " + strKey + " is not a boolean!");    
-}
-
 void IniParser::handleSection(const string &strSection) {
 
     // even if the regex guarantees that the match is longer than 2, it's better to assert for debuggig purpuses
