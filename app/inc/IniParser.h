@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 /*
  * IniParser
  * Allows users to parse text files formatted as INI and access values based on their keys.
